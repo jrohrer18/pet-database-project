@@ -20,11 +20,11 @@ public class PetDatabase {
         boolean another = true;
         
         // Main Loop
-         while (another==true) {
+        while (another==true) {
              
-             int choice = getUserChoice();
+            int choice = getUserChoice();
             
-             switch (choice) {
+            switch (choice) {
              
              case 1:
                  
@@ -38,15 +38,25 @@ public class PetDatabase {
             
              case 3:
                 
+                updatePet();
+                break;
+                
+             case 4:
+                
+                removePet();
+                break;
+                
+             case 5:
+                
                 searchPetsByName();
                 break;
             
-             case 4:
+             case 6:
                 
                 searchPetsByAge();
                 break;
              
-             case 5:
+             case 7:
        
                 // Exit the program
                 another=false;
@@ -63,9 +73,11 @@ public class PetDatabase {
         System.out.println("What would you like to do?");
         System.out.println("1.) View all pets");
         System.out.println("2.) Add more pets");
-        System.out.println("3.) Search pets by name");
-        System.out.println("4.) Search pets by age");
-        System.out.println("5.) Exit Program");
+        System.out.println("3.) Update an existing pet");
+	System.out.println("4.) Remove an existing pet");
+        System.out.println("5.) Search pets by name");
+        System.out.println("6.) Search pets by age");
+        System.out.println("7.) Exit Program");
         System.out.println("Your choice: ");
         int choice = in.nextInt();
 
@@ -113,6 +125,48 @@ public class PetDatabase {
         printTableFooter();
     }
     
+    // Updating a pets information
+    public static void updatePet() {
+        
+        System.out.println();
+        showAllPets();
+        
+        // Prompt user for the ID of the pet they want to update
+        System.out.print("Enter the pet ID you want to update: ");
+        int petID= in.nextInt();
+        
+        // Prompt user to enter the updated information
+        System.out.print("Enter a new name and age: ");
+        
+        String newName = in.next();
+        int newAge = in.nextInt();
+        
+        //update the the previous name and age with the new info entered by the user
+        pets[petID].setName(newName);
+        pets[petID].setAge(newAge);
+
+        System.out.println("Pet updated.");
+        System.out.println();
+    }
+    
+    // Removing a pet from the database
+    public static void removePet() {
+        
+        System.out.println();
+        showAllPets();
+        
+        //prompt user to enter the ID of the pet they want to remove
+        System.out.print("Enter the pet ID you want to remove: ");
+        int petID= in.nextInt();
+        
+        for (int i= petID; i<petCount; i++) {
+                pets[i]=pets[i+1];
+        }
+        
+        petCount--;
+        System.out.println("Pet removed");
+    }
+    
     // Searching a pet in the database by name 
     public static void searchPetsByName() {
         
@@ -121,10 +175,10 @@ public class PetDatabase {
         System.out.println("Enter a pets name to search: ");
         String searchName = in.next();
         printTableHeader();
-        //iterate through the array until the name entered equals the name of a pet in the database
+        
         for (int i=0; i<petCount; i++) {
                 if (pets[i].getName().equals(searchName)) {
-                        printTableRow(i,pets[i].getName(),pets[i].getAge());
+                    printTableRow(i,pets[i].getName(),pets[i].getAge());
                 }
         }
         printTableFooter();
@@ -138,7 +192,7 @@ public class PetDatabase {
         System.out.println("Enter age to search: ");
         int searchAge = in.nextInt();
         printTableHeader();
-        //iterate through the array until the age entered equals a age in the database
+        
         for (int i=0; i<petCount; i++) {
                 if (pets[i].getAge()==searchAge) {
                         printTableRow(i,pets[i].getName(),pets[i].getAge());
