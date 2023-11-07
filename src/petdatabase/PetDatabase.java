@@ -3,6 +3,7 @@ package petdatabase;
 
 import java.io.*;
 import java.util.Scanner;
+import java.util.InputMismatchException;
 
 public class PetDatabase {
     
@@ -78,30 +79,47 @@ public class PetDatabase {
 
         int petsAdded=0;
         
+        in.nextLine();
+
+        
         while (true) {
             
-                System.out.print("add pet (name, age): ");
-                String name = in.next();
+                System.out.print("add pet (name age): ");
                 
-                // Exit the loop when "done" is entered
-                if (name.equals("done")) {
-                        break;
+                String input = in.nextLine(); 
+
+                if (input.equals("done")) {
+                    break;
                 }
-                int age = in.nextInt();
-                
-                // Check if the maximum pet limit is reached
-                if (petCount==100) {
-                        System.out.println("You cannot add more than 100 pets to the database");
-                        break;
+
+                // validate the input format
+                if (!input.matches("^[a-zA-Z]+\\s\\d+$")) {
+                    System.out.println("Error: "+input+" is not a valid input.");
+                    continue;
+                }
+
+                String[] parts = input.split(" ");
+                String name = parts[0];
+                int age = Integer.parseInt(parts[1]);
+                 
+                // Check for valid age
+                if (age < 1 || age > 20) {
+                    System.out.println("Error: " + age + " is not a valid age.");
+                    continue;
+                }
+                   
+                // Check if database is full max 5
+                if (petCount == 5) {
+                    System.out.println("Error: Database is full.");
+                    break;
                 }
                 
-                pets[petCount++]= new Pet(name, age);
-                
+                pets[petCount++] = new Pet(name, age);
                 petsAdded++;
+                
+         }
+            System.out.println(petsAdded + " pets added.");	
         }
-        System.out.println(petsAdded + " pets added.");	
-        return;
-    }
     
     public static void showAllPets() {
         // Display all pets
@@ -143,16 +161,26 @@ public class PetDatabase {
         System.out.println();
         showAllPets();
         
-        //prompt user to enter the ID of the pet they want to remove
+        // Prompt user to enter the ID of the pet they want to remove
         System.out.print("Enter the pet ID you want to remove: ");
-        int petID= in.nextInt();
-        
-        for (int i= petID; i<petCount; i++) {
-                pets[i]=pets[i+1];
+        try {
+            int petID = in.nextInt();
+            // Check if ID exists in database
+            if (petID < 0 || petID >= petCount) {
+                System.out.println("Error: ID " + petID + " does not exist.");
+                return;
+            }        
+            for (int i= petID; i<petCount; i++) {
+                    pets[i]=pets[i+1];
+            }
+            pets[petCount - 1] = null; // Remove the last element
+            petCount--;
+            System.out.println("Pet removed.");
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid pet ID.");
+            in.nextLine(); 
         }
         
-        petCount--;
-        System.out.println("Pet removed");
     }
     
     // Searching a pet in the database by name 
@@ -213,7 +241,8 @@ public class PetDatabase {
     
     // Load pet data
     public static void loadPetData() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("petdata.txt"))) {
+        String filePath = "src/petdatabase/petdata.txt";
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
