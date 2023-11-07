@@ -1,6 +1,7 @@
 
 package petdatabase;
 
+import java.io.*;
 import java.util.Scanner;
 
 public class PetDatabase {
@@ -15,6 +16,9 @@ public class PetDatabase {
     static Pet[] pets = new Pet[100];
     
     public static void main(String[] args) {
+        
+        loadPetData();
+
         
         // Control main loop
         boolean another = true;
@@ -38,26 +42,13 @@ public class PetDatabase {
             
              case 3:
                 
-                updatePet();
-                break;
-                
-             case 4:
-                
                 removePet();
                 break;
-                
-             case 5:
-                
-                searchPetsByName();
-                break;
-            
-             case 6:
-                
-                searchPetsByAge();
-                break;
              
-             case 7:
-       
+             case 4:
+                
+                savePetData();
+
                 // Exit the program
                 another=false;
                 System.out.println("Goodbye");
@@ -73,11 +64,8 @@ public class PetDatabase {
         System.out.println("What would you like to do?");
         System.out.println("1.) View all pets");
         System.out.println("2.) Add more pets");
-        System.out.println("3.) Update an existing pet");
-	System.out.println("4.) Remove an existing pet");
-        System.out.println("5.) Search pets by name");
-        System.out.println("6.) Search pets by age");
-        System.out.println("7.) Exit Program");
+	System.out.println("3.) Remove an existing pet");
+        System.out.println("4.) Exit Program");
         System.out.println("Your choice: ");
         int choice = in.nextInt();
 
@@ -222,6 +210,37 @@ public class PetDatabase {
         }
         System.out.println(count+" rows in set.");
     }
+    
+    // Load pet data
+    public static void loadPetData() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("petdata.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String name = parts[0];
+                    int age = Integer.parseInt(parts[1]);
+                    pets[petCount++] = new Pet(name, age);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading pet data from file: " + e.getMessage());
+        }
+    }
+    
+    // Save pet data
+    public static void savePetData() {
+        String filePath = "src/petdatabase/petdata.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (int i = 0; i < petCount; i++) {
+                writer.write(pets[i].getName() + "," + pets[i].getAge());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving pet data to file: " + e.getMessage());
+        }
+    }
+   
         
 }
     
